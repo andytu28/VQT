@@ -1,0 +1,32 @@
+#!/bin/bash
+
+
+GPUIDX=$1
+DATA_NAME=$2
+NUM_CLASSES=$3
+Q_PROMPT_LEN=$4
+OPTIMIZER=$5
+FEATURE=$6
+
+MODEL_ROOT=pre-trained_weights
+DATA_PATH=vtab_data
+OUTPUT_DIR=h2t_vit_experiments/VQTSup_${Q_PROMPT_LEN}_${OPTIMIZER}
+
+
+CUDA_VISIBLE_DEVICES=$GPUIDX python head2toe_train.py \
+  --train-type "h2t-prompt" \
+  --config-file configs/h2t-prompt/vtab.yaml \
+  --optimizer $OPTIMIZER \
+  MODEL.TYPE "h2t-vit" \
+  MODEL.TRANSFER_TYPE "h2t-prompt" \
+  DATA.BATCH_SIZE "128" \
+  MODEL.H2T.NUM_QUERY_TOKENS "$Q_PROMPT_LEN" \
+  MODEL.H2T.DROPOUT "0.1" \
+  DATA.FEATURE $FEATURE \
+  DATA.NAME $DATA_NAME \
+  DATA.NUMBER_CLASSES $NUM_CLASSES \
+  DATA.DATAPATH $DATA_PATH \
+  MODEL.MODEL_ROOT $MODEL_ROOT \
+  OUTPUT_DIR $OUTPUT_DIR \
+  SOLVER.OPTIMIZER $OPTIMIZER \
+  SOLVER.DBG_TRAINABLE "True"
